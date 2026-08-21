@@ -1,0 +1,7 @@
+{
+  "$comentario": "Los permisos de esta seccion. Lo que no esta aca, se pregunta.",
+  "permissions": {
+    "allow": ["Read", "Glob", "Grep", "Bash(git status)", "Bash(git diff *)", "Bash(Rscript *)"],
+    "deny": ["Bash(rm -rf *)", "Bash(curl * | sh)", "Read(./.git/config)"]
+  }
+}

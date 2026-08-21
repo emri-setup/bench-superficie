@@ -1,0 +1,38 @@
+{
+  "$comentario": "Seccion de BANCO DE PRUEBAS (benchmark #239). Muerte anunciada: se borra tras el veredicto.",
+
+  "providerId": "ansgis",
+  "providerName": "AnsGIS",
+  "serviceId": "bench-superficie",
+  "version": 1,
+
+  "name": "Superficie de espacios verdes",
+  "description": "Calcula la superficie total de los espacios verdes publicos de una comuna, en hectareas, con recibo de que funcion la calculo.",
+
+  "syncBlock": false,
+  "syncPubKeyDomain": "_ans.ans.zone",
+
+  "variables": [
+    { "nombre": "zona",  "descripcion": "La zona donde va a vivir la seccion", "requerido": true },
+    { "nombre": "alias", "descripcion": "Como queres llamarla", "requerido": false, "porDefecto": "bench-superficie" }
+  ],
+
+  "declara": {
+    "ansName": "ans://v1.0.0.%alias%-%zona%.ans.zone",
+    "ruta": "%zona%.ans.zone/a/%alias%",
+    "capacidades": [
+      { "paquete": "sf", "funcion": "st_read" },
+      { "paquete": "sf", "funcion": "st_transform" },
+      { "paquete": "sf", "funcion": "st_area" }
+    ],
+    "datos": [
+      { "fuente": "GCBA", "dataset": "espacios-verdes", "archivo": "datos/comuna1-espacios-verdes.geojson", "md5": "04ca9db868bc98c0f6d4efa417d56d76" }
+    ],
+    "herramientas": [
+      { "cli": "Rscript", "universo": "https://emri-setup.r-universe.dev" }
+    ],
+    "obras": [
+      { "archivo": "obras/superficie-comuna1.json", "que_es": "el numero en hectareas con su recibo: paquete, funcion, version y CRS" }
+    ]
+  }
+}

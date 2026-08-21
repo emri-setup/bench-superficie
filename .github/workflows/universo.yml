@@ -1,0 +1,32 @@
+# Lo unico que va en el repo de una seccion. La maquinaria vive aparte y versionada.
+# Calcado del universe-template de r-universe: 20 lineas que llaman al flujo central.
+name: Universo
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    uses: emri-setup/ansgis-maquinaria/.github/workflows/verificar.yml@v1
+
+  rutas-existen:
+    name: Toda ruta que nombra el CLAUDE.md existe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Ningun archivo fantasma
+        run: |
+          set -u; falla=0
+          # rutas entre comillas invertidas que parecen archivos o carpetas
+          rutas=$(grep -oE '`[A-Za-z0-9_./<>-]+\.(json|md|R|py|yml)`|`[a-z0-9_-]+/`' CLAUDE.md                   | tr -d '`' | sed 's/<[^>]*>/*/' | sort -u)
+          for r in $rutas; do
+            if ! ls $r >/dev/null 2>&1; then echo "  FANTASMA: $r"; falla=1; fi
+          done
+          if [ "$falla" -eq 1 ]; then
+            echo "El CLAUDE.md nombra archivos que no existen. Una seccion nueva arrancaria leyendo el vacio."
+            exit 1
+          fi
+          echo "OK - todas las rutas del CLAUDE.md existen."
