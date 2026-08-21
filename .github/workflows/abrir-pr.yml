@@ -1,0 +1,27 @@
+# La seccion empuja su rama con una llave de deploy (sin identidad de GitHub).
+# ESTE flujo abre el pull request por ella, con la identidad github-actions[bot].
+# Asi el agente no firma nada: la fusion queda del lado de una persona.
+name: Abrir PR de obra
+on:
+  push:
+    branches: ["obra/**", "trampa/**"]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  abrir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: PR si no existe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh pr list --head "${GITHUB_REF_NAME}" --json number --jq length)
+          if [ "$n" = "0" ]; then
+            gh pr create --base main --head "${GITHUB_REF_NAME}" \
+              --title "Obra: ${GITHUB_REF_NAME}" \
+              --body "PR abierto automaticamente por el flujo abrir-pr. La rama la empujo la seccion con su llave de deploy. La fusion (la firma) es de una persona."
+          else
+            echo "ya hay PR para ${GITHUB_REF_NAME}"
+          fi
