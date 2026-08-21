@@ -1,7 +1,27 @@
 {
   "$comentario": "Los permisos de esta seccion. Lo que no esta aca, se pregunta.",
   "permissions": {
-    "allow": ["Read", "Glob", "Grep", "Bash(git status)", "Bash(git diff *)", "Bash(Rscript *)"],
-    "deny": ["Bash(rm -rf *)", "Bash(curl * | sh)", "Read(./.git/config)"]
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write(obras/**)",
+      "Write(notas/**)",
+      "Edit(obras/**)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git push origin obra/*)",
+      "Bash(git log *)",
+      "Bash(Rscript *)",
+      "Bash(md5sum *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(curl * | sh)",
+      "Read(./.git/config)"
+    ]
   }
 }
