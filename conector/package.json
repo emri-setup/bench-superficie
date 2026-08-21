@@ -1,0 +1,8 @@
+{
+  "name": "ansgis.bench-superficie-conector",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.mjs",
+  "files": ["index.mjs", "cordis.patch.yml"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}
