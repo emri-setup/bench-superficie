@@ -1,0 +1,18 @@
+Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.4.0; sf_use_s2() is TRUE
+md5 datos: 04ca9db868bc98c0f6d4efa417d56d76 
+Reading layer `comuna1-espacios-verdes' from data source 
+  `/srv/bench-superficie/datos/comuna1-espacios-verdes.geojson' 
+  using driver `GeoJSON'
+Simple feature collection with 387 features and 8 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -58.39277 ymin: -34.629 xmax: -58.33983 ymax: -34.5785
+Geodetic CRS:  WGS 84
+Entidades leidas: 387 
+CRS transformado a: EPSG:5347 
+Area total (m2): 3261922 [m^2] 
+Area total (ha): 326.1922 
+version sf: 1.1.2 
+version R: 4.3.3 
+
+Obra escrita en obras/superficie-comuna1.json
