@@ -1,0 +1,13 @@
+{
+  "resultado_ha": 326.192231372762,
+  "recibo": {
+    "paquete": "sf",
+    "funcion": "st_area",
+    "version_sf": "1.1.2",
+    "version_r": "4.3.3",
+    "crs": "EPSG:5347",
+    "entidades": 387,
+    "md5_datos": "04ca9db868bc98c0f6d4efa417d56d76"
+  },
+  "fecha": "2026-08-21"
+}
