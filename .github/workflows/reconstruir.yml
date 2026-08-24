@@ -1,0 +1,107 @@
+# DESPERTAR A LA SECCION.
+#
+# El PEDIDO llega como una etiqueta `aprobar-obra` en un issue (o a mano).
+# La seccion se reconstruye a si misma, y ANTES DE TERMINAR el porton de la
+# maquinaria vuelve a verificar lo que dejo. La OBRA no sale sin RECIBO.
+#
+# NO CORRE TODAVIA: le falta el secreto CLAUDE_CODE_OAUTH_TOKEN, que lo pone
+# Emir a mano en Settings > Secrets and variables > Actions. Es una credencial.
+#
+# Entradas y salidas verificadas contra el action.yml real de
+# anthropics/claude-code-action en 459ad35 (v1.0.194, 17-ago-2026).
+# La accion NO tiene entrada de tiempo maximo: el tope va en timeout-minutes.
+# El modelo y las herramientas NO son entradas: van en claude_args (docs/usage.md).
+name: Reconstruir la seccion
+
+on:
+  workflow_dispatch:
+    inputs:
+      pedido:
+        description: "Que tiene que hacer la seccion"
+        required: true
+        type: string
+  issues:
+    types: [labeled]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  reconstruir:
+    name: La seccion se rehace y el porton la revisa
+    # Por etiqueta: solo el pedido de quien es dueno del repo. Un issue de
+    # cualquiera con texto adentro es entrada no confiable.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.label.name == 'aprobar-obra' &&
+       github.event.issue.user.login == github.repository_owner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25          # el tope de tiempo: la accion no tiene entrada propia
+    permissions:
+      contents: write            # para dejar la rama con la obra
+      pull-requests: write       # para abrir el pull request
+      issues: write              # para contestar el pedido
+
+    steps:
+      - name: El cuerpo de la seccion
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Traer la maquinaria (el porton)
+        uses: actions/checkout@v5
+        with:
+          repository: emri-setup/ansgis-maquinaria
+          ref: v1
+          path: .maquinaria
+
+      - name: Estado de entrada — el porton antes de tocar nada
+        env:
+          CARPETA: plantillas
+        run: python3 .maquinaria/scripts/verificar.py
+
+      - name: Despertar a la seccion
+        id: seccion
+        uses: anthropics/claude-code-action@459ad358ae43fea66bfefd0a1f8d840b4b9791fb # v1.0.194
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          settings: .claude/settings.json
+          prompt: |
+            Sos esta seccion. Lee CLAUDE.md entero antes de tocar nada.
+
+            El pedido es:
+            ${{ github.event.inputs.pedido || github.event.issue.title }}
+
+            Reglas que el porton hace cumplir despues, no son consejos:
+            - Toda capacidad que declares en plantillas/ansgis-*.json tiene que
+              existir en https://diccionario.daiacaba.com.ar. Lo que no este,
+              va como hueco declarado, no como capacidad.
+            - Toda ruta que nombres en CLAUDE.md tiene que existir.
+            - La obra va a obras/ con su recibo: que funcion, que version, que
+              licencia. Sin recibo no hay obra.
+            - Ningun secreto entra al repositorio.
+            - Castellano rioplatense.
+          # Sin espacios adentro de --allowedTools: los permisos de Bash, que
+          # llevan espacios, ya vienen de .claude/settings.json (entrada settings).
+          claude_args: |
+            --max-turns 30
+            --allowedTools Read,Glob,Grep,Edit,Write
+
+      - name: El porton sobre lo que la seccion dejo
+        if: always()
+        env:
+          CARPETA: plantillas
+        run: python3 .maquinaria/scripts/verificar.py
+
+      - name: El recibo de la corrida
+        if: always()
+        env:
+          CONCLUSION: ${{ steps.seccion.outputs.conclusion }}
+          RAMA: ${{ steps.seccion.outputs.branch_name }}
+          SESION: ${{ steps.seccion.outputs.session_id }}
+        run: |
+          {
+            echo "## Reconstruccion de la seccion"
+            echo "- resultado: \`${CONCLUSION:-no corrio}\`"
+            echo "- rama: \`${RAMA:-ninguna}\`"
+            echo "- sesion: \`${SESION:-ninguna}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

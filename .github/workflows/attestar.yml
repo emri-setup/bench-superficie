@@ -1,0 +1,27 @@
+# E4: el recibo criptografico de la obra — attestation Sigstore.
+# Firma la procedencia del archivo de obra; se verifica AFUERA de GitHub
+# con `gh attestation verify` (o cosign), o sea que sobrevive al forge.
+name: Attestar la obra
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Rama donde vive la obra"
+        default: "obra/superficie-comuna1"
+        type: string
+permissions:
+  id-token: write
+  attestations: write
+  contents: read
+jobs:
+  attestar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            obras/superficie-comuna1.json
+            obras/superficie-comuna1.log
