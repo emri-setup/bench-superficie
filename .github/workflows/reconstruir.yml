@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25          # el tope de tiempo: la accion no tiene entrada propia
     permissions:
+      id-token: write            # la action necesita OIDC (bug del molde, cazado por E3)
       contents: write            # para dejar la rama con la obra
       pull-requests: write       # para abrir el pull request
       issues: write              # para contestar el pedido
